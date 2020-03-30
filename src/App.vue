@@ -1,28 +1,74 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <TodoWrite  :notes="notes" />
+    <div style="padding-top:60px">
+      <Todo
+              v-for="(not, index) in notes"
+              :note="not"
+              @notEdit="noEdit(not)"
+              @trash="deleteItem(index)"
+              @toEdit="toEdit(not)"
+              @update="update(not)"
+      />
+    </div>
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  import TodoWrite from './components/NotesForm'
+  import Todo from './components/NotesList'
+  export default {
+    name: 'app',
+    components: {
+      TodoWrite,
+      Todo,
+      props:[""]
+    },
+
+    data(){
+      return{
+        notes: [],
+      }
+    },
+    mounted(){
+      let data = localStorage.getItem('toDoList')
+      if (!data){
+        return
+      }
+      this.notes = JSON.parse(localStorage.getItem('toDoList'))
+      console.log(this.notes)
+    },
+    methods:{
+
+      deleteItem(elem){
+        this.notes.splice(elem, 1); // supprime 1 élément à la position pos
+        localStorage.setItem('toDoList', JSON.stringify(this.notes))
+      },
+
+      toEdit(elem){
+        console.log(elem)
+        elem.isEditing = true
+        //  elem.isEditing = true
+      },
+      noEdit(elem){
+        elem.isEditing = false
+        // console.log(elem)
+      },
+
+      update(elem){
+
+        if (elem.text.trim().length == 0){
+          return
+        }
+        elem.isEditing = false
+        localStorage.setItem('toDoList', JSON.stringify(this.notes))
+      }
+    }
   }
-}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+
 </style>
